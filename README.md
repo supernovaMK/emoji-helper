@@ -1,73 +1,148 @@
-# Welcome to your Lovable project
+# 😊 이모지 도우미 (Emoji Assistant)
+## URL : https://emoji-serin-helper.lovable.app/
+## 📌 서비스 요약
 
-## Project info
+**이모지 도우미**는 사회초년생 및 직장인들이 메시지를 보낼 때의 말투와 어투, 이모지 선택에 대한 고민을 덜어주는 간단하고 실용적인 웹 서비스입니다.  
+보내고 싶은 메시지를 입력하면, 문맥에 어울리는 **이모지를 자연스럽게 삽입**하고, **맞춤법·문법·말투·톤 교정**을 통해 다양한 버전의 메시지를 제공합니다.
 
-**URL**: https://lovable.dev/projects/f06e0248-8352-4b36-b3a7-03c0a5460b1e
+이제는 단순한 이모지 추가를 넘어서, **조건부 말투 보정 및 교정 여부 명시 기능**이 추가되어 사용자는 **메시지의 변화를 직접 인지**하고 **더 신뢰할 수 있는 결과**를 얻게 됩니다.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🎯 페르소나
 
-**Use Lovable**
+### 👩‍💼 박세린 (25세) — 사회초년생
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f06e0248-8352-4b36-b3a7-03c0a5460b1e) and start prompting.
+- **직업**: 광고 기획사 인턴 → 정직원 전환 예정  
+- **라이프스타일**: 평일 9시 출근, 야근 잦음. 상사와 선배에게 자주 메시지를 보냄.  
+- **성격 및 태도**:
+  - 공손하고 예의 바른 표현에 민감함
+  - 말투와 이모지 선택에 대해 고민이 많음
+  - 메시지가 무뚝뚝하게 보일까 봐 불안해함
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🎯 사용자 목표
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- 딱딱하게 느껴지지 않도록 부드러운 말투를 사용하고 싶음  
+- 이모지를 자연스럽게 추가해 **호감 가는 커뮤니케이션**을 하고 싶음  
+- 수신자에 따라 말투와 이모지를 조절하고 싶음 (상사/동료/친구 등)  
+- **맞춤법, 말투, 이모지의 변화가 어떻게 적용되었는지 명확히 알고 싶음**
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 🧨 페인 포인트
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- “감사합니다.”만 보내면 너무 건조하게 느껴짐  
+- 어떤 이모지를 써야 자연스러운지 몰라서 생략하거나 과하게 씀  
+- 메시지의 말투가 어색해 보일까 고민됨  
+- 감정 표현이 서툴러서 “차갑다”는 피드백을 받은 적 있음  
+- 맞춤법이나 표현을 잘못 써놓고 메시지를 보낼까봐 걱정됨  
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🧾 사용자 시나리오
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+### 🕐 상황
 
-**Edit a file directly in GitHub**
+세린은 팀장에게 회의 일정을 다시 전달하려고 합니다.  
+메시지는 다음과 같습니다:  
+> `회의는 내일 오전 10시로 변경 되었습니다 확인부탁드립니다`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+하지만 문장이 딱딱하고, 이모지도 없어 건조하게 느껴집니다. 맞춤법 오류도 있을 수 있어 걱정됩니다.
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### 💬 시나리오 흐름
 
-## What technologies are used for this project?
+1. 모바일 웹 브라우저에서 **이모지 도우미** 접속  
+2. 메시지 입력창에 문장을 입력  
+3. 다음과 같은 **3가지 버전**의 추천 메시지를 제공받음:
+   - **공손형**: 문법 교정 + 부드러운 어투 + 이모지
+   - **친근형**: 말투 약간 부드럽게 + 캐주얼한 이모지
+   - **캐주얼형**: 단순하고 가볍게, 감정 중심 이모지 삽입  
+4. 맞춤법이 교정되었거나 톤이 변경된 경우, 해당 내용이 **명확하게 표시됨**
+5. 마음에 드는 문장을 클릭하여 **복사** 후 메신저에 붙여 전송  
+6. 상대방의 반응이 더 부드럽고 원활해짐
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### 📣 사용자 스토리
 
-## How can I deploy this project?
+> "신입사원으로서, 저는 메시지가 무례하거나 딱딱하게 느껴지지 않도록 조심하고 싶습니다. 이모지를 자연스럽게 넣고, 문장도 부드럽게 교정되어 있다면 더 자신 있게 메시지를 보낼 수 있습니다."
 
-Simply open [Lovable](https://lovable.dev/projects/f06e0248-8352-4b36-b3a7-03c0a5460b1e) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+## ✅ 인수 조건 (Acceptance Criteria)
 
-Yes, you can!
+- **Given**: 사용자가 서비스에 접속하여 메시지를 입력했을 때  
+- **When**: 제출 버튼을 클릭하면  
+- **Then**:  
+  - 2초 이내에 이모지 및 말투가 반영된 메시지 1~3개 버전을 출력한다  
+  - 맞춤법·문법 교정이 발생했을 경우 `"맞춤법이 수정되었습니다."` 문구를 함께 출력한다  
+  - 메시지 톤(공손형, 친근형 등)이 실질적으로 변경된 경우에만 `"메시지 톤이 [공손형]으로 수정되었습니다."` 문구를 함께 출력한다
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 💎 핵심 가치 제안
+
+| 가치                | 설명 |
+|---------------------|------|
+| 말투 자신감 회복      | 신입사원이 예의와 따뜻함을 표현하는 데 자신감을 가질 수 있음 |
+| 감정 전달 효율화     | 적절한 이모지를 통해 메시지의 뉘앙스가 잘 전달됨 |
+| 교정 결과 인지 가능성 | 맞춤법/톤 변화가 명시되어 서비스에 대한 신뢰도 증가 |
+| 초간편 복사 사용성   | 복잡한 설정 없이 결과를 바로 복사하여 사용 가능 |
+
+---
+
+## 🔧 핵심 기능 요약
+
+- 사용자가 텍스트 메시지 입력  
+- **문맥 분석** 후:
+  - 자연스러운 이모지 자동 삽입  
+  - 맞춤법 및 문법 오류 교정 (필요 시 `"맞춤법이 수정되었습니다"` 문구 함께 표시)  
+  - 조건부 톤 변경 (공손형, 친근형 등) + `"메시지 톤이 [형태]으로 수정되었습니다"` 명시  
+- 1~3개의 톤 버전 메시지 제시  
+- **클릭 한 번으로 복사 가능**  
+- 수신자 유형 선택 기능: 상사 / 동료 / 친구
+
+---
+
+## 🧠 예시 출력 형식
+
+> **[공손형]**  
+> 회의는 내일 오전 10시로 변경되었습니다 🕙 확인 부탁드립니다 🙏  
+> ✅ 맞춤법이 수정되었습니다  
+> ✅ 메시지 톤이 공손형으로 수정되었습니다  
+
+> **[친근형]**  
+> 내일 오전 10시에 회의로 바뀌었어~ 확인해줘 😄  
+> ✅ 메시지 톤이 친근형으로 수정되었습니다  
+
+> **[캐주얼형]**  
+> 내일 10시로 회의 바뀜~ 참고 👀  
+> (변경사항 없음)
+
+---
+
+## 🚀 향후 확장 아이디어
+
+- 사용자 말투 스타일 학습 → 개인화된 이모지/톤 추천  
+- 슬랙, 카카오톡, 메신저 API 연동 → 직접 전송 가능  
+- 자주 쓰는 문장 저장 및 추천 이력 제공  
+- 회사/업계/관계별 커뮤니케이션 문화 기반 자동 최적화
+
+---
+
+## 📁 프로젝트 상태
+
+현재는 프로토타입 단계이며, 주요 기능은 목업 데이터 및 간단한 처리 로직 기반으로 구현됩니다.  
+AI 연동 및 문맥 기반 자연어 처리 고도화는 추후 단계에서 확장될 예정입니다.
+
+---
+
+## UI
+
+<img width="736" alt="image" src="https://github.com/user-attachments/assets/0902b04d-b169-4d6e-a293-87bd01c2f49f" />
+<img width="672" alt="image" src="https://github.com/user-attachments/assets/b165186f-2eb0-4933-953a-51fafea54372" />
+
