@@ -1,6 +1,6 @@
 
 import { MessageVariant } from "@/pages/Index";
-import { Copy, Check, Sparkles, AlertCircle } from "lucide-react";
+import { Copy, Check, Sparkles, AlertCircle, RefreshCw } from "lucide-react";
 import { useState } from "react";
 
 interface MessageSuggestionsProps {
@@ -37,6 +37,7 @@ export const MessageSuggestions = ({ originalMessage, suggestions, onCopy }: Mes
   };
 
   const hasGrammarIssues = suggestions.some(s => s.grammarIssues && s.grammarIssues.length > 0);
+  const hasToneChanges = suggestions.some(s => s.toneChanged);
 
   return (
     <div className="space-y-4">
@@ -58,7 +59,7 @@ export const MessageSuggestions = ({ originalMessage, suggestions, onCopy }: Mes
             <div className="flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
               <div>
-                <h4 className="text-sm font-medium text-amber-800 mb-1">맞춤법 검사 결과</h4>
+                <h4 className="text-sm font-medium text-amber-800 mb-1">맞춤법이 수정되었습니다</h4>
                 {suggestions[0].grammarIssues && suggestions[0].grammarIssues.map((issue, index) => (
                   <p key={index} className="text-xs text-amber-700 mb-1">• {issue}</p>
                 ))}
@@ -67,6 +68,20 @@ export const MessageSuggestions = ({ originalMessage, suggestions, onCopy }: Mes
                     <span className="font-medium">수정된 문장:</span> {suggestions[0].correctedText}
                   </p>
                 )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {hasToneChanges && (
+          <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+            <div className="flex items-start gap-2">
+              <RefreshCw className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="text-sm font-medium text-purple-800 mb-1">메시지 톤이 조정되었습니다</h4>
+                <p className="text-xs text-purple-700">
+                  각 추천 버전에 맞게 문체와 어미가 자연스럽게 변경되었습니다.
+                </p>
               </div>
             </div>
           </div>
@@ -86,7 +101,7 @@ export const MessageSuggestions = ({ originalMessage, suggestions, onCopy }: Mes
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <span className="text-lg">{getToneIcon(suggestion.type)}</span>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getToneColor(suggestion.type)}`}>
                       {suggestion.label}
@@ -94,6 +109,11 @@ export const MessageSuggestions = ({ originalMessage, suggestions, onCopy }: Mes
                     {suggestion.grammarIssues && suggestion.grammarIssues.length > 0 && (
                       <span className="px-2 py-1 rounded-full text-xs font-medium bg-amber-100 border border-amber-300 text-amber-700">
                         맞춤법 수정됨
+                      </span>
+                    )}
+                    {suggestion.toneChanged && (
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 border border-purple-300 text-purple-700">
+                        톤 조정됨
                       </span>
                     )}
                   </div>

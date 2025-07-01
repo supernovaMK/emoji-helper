@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { MessageInput } from "@/components/MessageInput";
 import { MessageSuggestions } from "@/components/MessageSuggestions";
@@ -14,6 +13,8 @@ export type MessageVariant = {
   description: string;
   correctedText?: string;
   grammarIssues?: string[];
+  toneChanged?: boolean;
+  originalTone?: string;
 };
 
 const Index = () => {
@@ -25,8 +26,9 @@ const Index = () => {
   const checkGrammarAndSpelling = (text: string) => {
     const issues: string[] = [];
     let correctedText = text;
+    let hasChanges = false;
 
-    // 기본적인 맞춤법 검사
+    // 확장된 맞춤법 검사
     const corrections = [
       { wrong: "안녕하세요", correct: "안녕하세요" },
       { wrong: "감사합니다", correct: "감사합니다" },
@@ -39,25 +41,38 @@ const Index = () => {
       { wrong: "드릴게요", correct: "드릴게요" },
       { wrong: "될수있습니다", correct: "될 수 있습니다" },
       { wrong: "할수있습니다", correct: "할 수 있습니다" },
+      { wrong: "갈수있습니다", correct: "갈 수 있습니다" },
+      { wrong: "올수있습니다", correct: "올 수 있습니다" },
+      { wrong: "해드릴게요", correct: "해드릴게요" },
+      { wrong: "그럼안녕", correct: "그럼 안녕" },
+      { wrong: "잘부탁드립니다", correct: "잘 부탁드립니다" },
     ];
 
-    // 띄어쓰기 검사
-    const spacingIssues = [
-      { pattern: /(\w+)(할수|될수|갈수|올수)(\w+)/g, replacement: "$1할 수$3" },
-      { pattern: /(\w+)(해주|드려|봐주|와주|가주)(\w+)/g, replacement: "$1해 주$3" },
+    // 띄어쓰기 검사 패턴 확장
+    const spacingPatterns = [
+      { pattern: /(\w+)(할수|될수|갈수|올수)(\s*)(\w+)/g, replacement: "$1할 수 $4", issue: "띄어쓰기 수정" },
+      { pattern: /(\w+)(해주|드려|봐주|와주|가주)(\s*)(\w+)/g, replacement: "$1해 주 $4", issue: "띄어쓰기 수정" },
+      { pattern: /잘(\s*)부탁/g, replacement: "잘 부탁", issue: "띄어쓰기 수정" },
+      { pattern: /그럼(\s*)안녕/g, replacement: "그럼 안녕", issue: "띄어쓰기 수정" },
     ];
 
+    // 맞춤법 교정 적용
     corrections.forEach(({ wrong, correct }) => {
       if (text.includes(wrong) && wrong !== correct) {
         correctedText = correctedText.replace(new RegExp(wrong, 'g'), correct);
         issues.push(`'${wrong}' → '${correct}'`);
+        hasChanges = true;
       }
     });
 
-    spacingIssues.forEach(({ pattern, replacement }) => {
-      if (pattern.test(text)) {
+    // 띄어쓰기 검사 적용
+    spacingPatterns.forEach(({ pattern, replacement, issue }) => {
+      if (pattern.test(correctedText)) {
         correctedText = correctedText.replace(pattern, replacement);
-        issues.push("띄어쓰기 수정됨");
+        if (!issues.includes(issue)) {
+          issues.push(issue);
+          hasChanges = true;
+        }
       }
     });
 
@@ -66,7 +81,67 @@ const Index = () => {
       issues.push("문장 끝에 마침표나 느낌표 추가 권장");
     }
 
-    return { correctedText, issues };
+    return { correctedText: hasChanges ? correctedText : text, issues: hasChanges ? issues : [] };
+  };
+
+  const adjustToneForRecipient = (message: string, targetTone: "formal" | "friendly" | "casual", recipientType: RecipientType) => {
+    let adjustedMessage = message;
+    let toneChanged = false;
+    let originalTone = "neutral";
+
+    // 원본 메시지의 톤 분석
+    if (message.includes("습니다") || message.includes("드립니다")) {
+      originalTone = "formal";
+    } else if (message.includes("요") || message.includes("해요")) {
+      originalTone = "friendly";
+    } else if (message.includes("야") || message.includes("어") || message.includes("지")) {
+      originalTone = "casual";
+    }
+
+    // 톤 변경이 필요한 경우에만 적용
+    if (originalTone !== targetTone) {
+      if (targetTone === "formal" && recipientType === "boss") {
+        // 공손형으로 변경
+        adjustedMessage = adjustedMessage
+          .replace(/해요$/g, "합니다")
+          .replace(/이에요$/g, "입니다")
+          .replace(/거예요$/g, "것입니다")
+          .replace(/될 거예요$/g, "될 것입니다")
+          .replace(/할게요$/g, "하겠습니다")
+          .replace(/부탁해요$/g, "부탁드립니다");
+        
+        if (adjustedMessage !== message) {
+          toneChanged = true;
+        }
+      } else if (targetTone === "friendly") {
+        // 친근형으로 변경
+        adjustedMessage = adjustedMessage
+          .replace(/습니다$/g, "요")
+          .replace(/입니다$/g, "이에요")
+          .replace(/것입니다$/g, "거예요")
+          .replace(/하겠습니다$/g, "할게요")
+          .replace(/부탁드립니다$/g, "부탁해요");
+        
+        if (adjustedMessage !== message) {
+          toneChanged = true;
+        }
+      } else if (targetTone === "casual" && recipientType === "friend") {
+        // 캐주얼형으로 변경
+        adjustedMessage = adjustedMessage
+          .replace(/습니다$/g, "어")
+          .replace(/해요$/g, "해")
+          .replace(/이에요$/g, "야")
+          .replace(/거예요$/g, "거야")
+          .replace(/부탁해요$/g, "부탁해")
+          .replace(/할게요$/g, "할게");
+        
+        if (adjustedMessage !== message) {
+          toneChanged = true;
+        }
+      }
+    }
+
+    return { adjustedMessage, toneChanged, originalTone };
   };
 
   const addEmojisToMessage = (
@@ -147,62 +222,95 @@ const Index = () => {
     const textToUse = issues.length > 0 ? correctedText : baseMessage;
 
     if (recipient === "boss") {
-      suggestions = [
-        {
-          type: "formal",
-          label: "공손형",
-          message: addEmojisToMessage(textToUse, "formal", { isQuestion, isRequest, isUpdate, isGratitude, isApology }),
-          description: "상사에게 정중하고 예의바른 톤",
-          correctedText: issues.length > 0 ? correctedText : undefined,
-          grammarIssues: issues.length > 0 ? issues : undefined
-        },
-        {
-          type: "friendly",
-          label: "친근형", 
-          message: addEmojisToMessage(textToUse, "friendly", { isQuestion, isRequest, isUpdate, isGratitude, isApology }),
-          description: "따뜻하면서도 예의를 갖춘 톤",
-          correctedText: issues.length > 0 ? correctedText : undefined,
-          grammarIssues: issues.length > 0 ? issues : undefined
-        }
-      ];
+      // 공손형
+      const formalTone = adjustToneForRecipient(textToUse, "formal", recipient);
+      const formalMessage = addEmojisToMessage(formalTone.adjustedMessage, "formal", { isQuestion, isRequest, isUpdate, isGratitude, isApology });
+      
+      suggestions.push({
+        type: "formal",
+        label: "공손형",
+        message: formalMessage,
+        description: "상사에게 정중하고 예의바른 톤",
+        correctedText: issues.length > 0 ? correctedText : undefined,
+        grammarIssues: issues.length > 0 ? issues : undefined,
+        toneChanged: formalTone.toneChanged,
+        originalTone: formalTone.originalTone
+      });
+
+      // 친근형
+      const friendlyTone = adjustToneForRecipient(textToUse, "friendly", recipient);
+      const friendlyMessage = addEmojisToMessage(friendlyTone.adjustedMessage, "friendly", { isQuestion, isRequest, isUpdate, isGratitude, isApology });
+      
+      suggestions.push({
+        type: "friendly",
+        label: "친근형", 
+        message: friendlyMessage,
+        description: "따뜻하면서도 예의를 갖춘 톤",
+        correctedText: issues.length > 0 ? correctedText : undefined,
+        grammarIssues: issues.length > 0 ? issues : undefined,
+        toneChanged: friendlyTone.toneChanged,
+        originalTone: friendlyTone.originalTone
+      });
     } else if (recipient === "colleague") {
-      suggestions = [
-        {
-          type: "friendly",
-          label: "친근형",
-          message: addEmojisToMessage(textToUse, "friendly", { isQuestion, isRequest, isUpdate, isGratitude, isApology }),
-          description: "동료에게 친근하고 협조적인 톤",
-          correctedText: issues.length > 0 ? correctedText : undefined,
-          grammarIssues: issues.length > 0 ? issues : undefined
-        },
-        {
-          type: "casual",
-          label: "캐주얼형",
-          message: addEmojisToMessage(textToUse, "casual", { isQuestion, isRequest, isUpdate, isGratitude, isApology }),
-          description: "편안하고 자연스러운 톤",
-          correctedText: issues.length > 0 ? correctedText : undefined,
-          grammarIssues: issues.length > 0 ? issues : undefined
-        }
-      ];
+      // 친근형
+      const friendlyTone = adjustToneForRecipient(textToUse, "friendly", recipient);
+      const friendlyMessage = addEmojisToMessage(friendlyTone.adjustedMessage, "friendly", { isQuestion, isRequest, isUpdate, isGratitude, isApology });
+      
+      suggestions.push({
+        type: "friendly",
+        label: "친근형",
+        message: friendlyMessage,
+        description: "동료에게 친근하고 협조적인 톤",
+        correctedText: issues.length > 0 ? correctedText : undefined,
+        grammarIssues: issues.length > 0 ? issues : undefined,
+        toneChanged: friendlyTone.toneChanged,
+        originalTone: friendlyTone.originalTone
+      });
+
+      // 캐주얼형
+      const casualTone = adjustToneForRecipient(textToUse, "casual", recipient);
+      const casualMessage = addEmojisToMessage(casualTone.adjustedMessage, "casual", { isQuestion, isRequest, isUpdate, isGratitude, isApology });
+      
+      suggestions.push({
+        type: "casual",
+        label: "캐주얼형",
+        message: casualMessage,
+        description: "편안하고 자연스러운 톤",
+        correctedText: issues.length > 0 ? correctedText : undefined,
+        grammarIssues: issues.length > 0 ? issues : undefined,
+        toneChanged: casualTone.toneChanged,
+        originalTone: casualTone.originalTone
+      });
     } else {
-      suggestions = [
-        {
-          type: "friendly",
-          label: "친근형",
-          message: addEmojisToMessage(textToUse, "friendly", { isQuestion, isRequest, isUpdate, isGratitude, isApology }),
-          description: "따뜻하고 다정한 톤",
-          correctedText: issues.length > 0 ? correctedText : undefined,
-          grammarIssues: issues.length > 0 ? issues : undefined
-        },
-        {
-          type: "casual",
-          label: "캐주얼형", 
-          message: addEmojisToMessage(textToUse, "casual", { isQuestion, isRequest, isUpdate, isGratitude, isApology }),
-          description: "편안하고 재미있는 톤",
-          correctedText: issues.length > 0 ? correctedText : undefined,
-          grammarIssues: issues.length > 0 ? issues : undefined
-        }
-      ];
+      // 친근형
+      const friendlyTone = adjustToneForRecipient(textToUse, "friendly", recipient);
+      const friendlyMessage = addEmojisToMessage(friendlyTone.adjustedMessage, "friendly", { isQuestion, isRequest, isUpdate, isGratitude, isApology });
+      
+      suggestions.push({
+        type: "friendly",
+        label: "친근형",
+        message: friendlyMessage,
+        description: "따뜻하고 다정한 톤",
+        correctedText: issues.length > 0 ? correctedText : undefined,
+        grammarIssues: issues.length > 0 ? issues : undefined,
+        toneChanged: friendlyTone.toneChanged,
+        originalTone: friendlyTone.originalTone
+      });
+
+      // 캐주얼형
+      const casualTone = adjustToneForRecipient(textToUse, "casual", recipient);
+      const casualMessage = addEmojisToMessage(casualTone.adjustedMessage, "casual", { isQuestion, isRequest, isUpdate, isGratitude, isApology });
+      
+      suggestions.push({
+        type: "casual",
+        label: "캐주얼형", 
+        message: casualMessage,
+        description: "편안하고 재미있는 톤",
+        correctedText: issues.length > 0 ? correctedText : undefined,
+        grammarIssues: issues.length > 0 ? issues : undefined,
+        toneChanged: casualTone.toneChanged,
+        originalTone: casualTone.originalTone
+      });
     }
 
     return suggestions;
