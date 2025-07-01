@@ -16,7 +16,7 @@ export const Header = () => {
       </h1>
       
       <p className="text-gray-600 text-sm leading-relaxed">
-        세린님의 메시지에 딱 맞는 이모지를<br />
+        슬링키님의 메시지에 딱 맞는 이모지를<br />
         자동으로 추천해드릴게요! ✨
       </p>
     </header>

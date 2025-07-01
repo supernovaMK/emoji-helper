@@ -1,6 +1,6 @@
 
 import { MessageVariant } from "@/pages/Index";
-import { Copy, Check, Sparkles } from "lucide-react";
+import { Copy, Check, Sparkles, AlertCircle } from "lucide-react";
 import { useState } from "react";
 
 interface MessageSuggestionsProps {
@@ -36,6 +36,8 @@ export const MessageSuggestions = ({ originalMessage, suggestions, onCopy }: Mes
     }
   };
 
+  const hasGrammarIssues = suggestions.some(s => s.grammarIssues && s.grammarIssues.length > 0);
+
   return (
     <div className="space-y-4">
       <div className="text-center">
@@ -50,6 +52,25 @@ export const MessageSuggestions = ({ originalMessage, suggestions, onCopy }: Mes
         <p className="text-gray-600 text-sm bg-gray-50 p-3 rounded-lg mb-4">
           {originalMessage}
         </p>
+
+        {hasGrammarIssues && (
+          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="text-sm font-medium text-amber-800 mb-1">맞춤법 검사 결과</h4>
+                {suggestions[0].grammarIssues && suggestions[0].grammarIssues.map((issue, index) => (
+                  <p key={index} className="text-xs text-amber-700 mb-1">• {issue}</p>
+                ))}
+                {suggestions[0].correctedText && (
+                  <p className="text-xs text-amber-700 mt-2">
+                    <span className="font-medium">수정된 문장:</span> {suggestions[0].correctedText}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
           <span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -70,6 +91,11 @@ export const MessageSuggestions = ({ originalMessage, suggestions, onCopy }: Mes
                     <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getToneColor(suggestion.type)}`}>
                       {suggestion.label}
                     </span>
+                    {suggestion.grammarIssues && suggestion.grammarIssues.length > 0 && (
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-amber-100 border border-amber-300 text-amber-700">
+                        맞춤법 수정됨
+                      </span>
+                    )}
                   </div>
                   
                   <p className="text-gray-800 font-medium mb-1 leading-relaxed">
